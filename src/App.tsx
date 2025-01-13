@@ -210,11 +210,21 @@ function App() {
       )}
       {selectedTabNo === TAB_CLIPBOARD && (
         <div>
+          <button
+            className="px-4 py-2 bg-gray-800 mb-8"
+            onClick={() => {
+              setClipboards([]);
+              refPrevClipboard.current = "";
+              refClipboards.current = [];
+            }}
+          >
+            clean
+          </button>
           {clipboards.map((s, index) => (
-            <p key={index}>{s}</p>
-          ))}
-          {clipboardsImage.map((img, index) => (
-            <img src={{ uri: `${img}` }} width="200" key={index} />
+            <div>
+              <p key={index}>{s}</p>
+              <br></br>
+            </div>
           ))}
         </div>
       )}
