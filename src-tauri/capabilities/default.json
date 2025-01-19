@@ -18,11 +18,18 @@
     "global-shortcut:allow-is-registered",
     "global-shortcut:allow-register",
     "global-shortcut:allow-unregister",
-    "clipboard-manager:allow-write-text",
-    "clipboard-manager:allow-write-image",
-    "clipboard-manager:allow-read-text",
-    "clipboard-manager:allow-read-image",
-    "clipboard-manager:allow-clear",
-    "clipboard-manager:allow-write-html"
+    "clipboard:allow-start-monitor",
+    "clipboard:allow-read-text",
+    "clipboard:allow-read-files",
+    "clipboard:allow-read-image-base64",
+    "clipboard:allow-read-image-binary",
+    "clipboard:allow-read-html",
+    "clipboard:allow-write-text",
+    "clipboard:allow-write-image-base64",
+    "clipboard:allow-write-image-binary",
+    "clipboard:allow-write-html",
+    "clipboard:allow-clear",
+    "clipboard:allow-has-text",
+    "clipboard:allow-has-image"
   ]
 }

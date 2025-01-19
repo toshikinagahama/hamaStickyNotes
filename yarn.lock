@@ -415,6 +415,11 @@
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.30.1.tgz#73bf1885ff052b82fbb0f82f8671f73c36e9137c"
   integrity sha512-D6qjsXGcvhTjv0kI4fU8tUuBDF/Ueee4SVX79VfNDXZa64TfCW1Slkb6Z7O1p7vflqZjcmOVdZlqf8gvJxc6og==
 
+"@tauri-apps/api@2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@tauri-apps/api/-/api-2.0.1.tgz#dc49d899fb873b96ee1d46a171384625ba5ad404"
+  integrity sha512-eoQWT+Tq1qSwQpHV+nw1eNYe5B/nm1PoRjQCRiEOS12I1b+X4PUcREfXVX8dPcBT6GrzWGDtaecY0+1p0Rfqlw==
+
 "@tauri-apps/api@^2", "@tauri-apps/api@^2.0.0":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@tauri-apps/api/-/api-2.2.0.tgz#daaff2515b1a4ff1e763cf84a414548b02b566c5"
@@ -485,13 +490,6 @@
     "@tauri-apps/cli-win32-arm64-msvc" "2.2.4"
     "@tauri-apps/cli-win32-ia32-msvc" "2.2.4"
     "@tauri-apps/cli-win32-x64-msvc" "2.2.4"
-
-"@tauri-apps/plugin-clipboard-manager@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@tauri-apps/plugin-clipboard-manager/-/plugin-clipboard-manager-2.2.0.tgz#3d8f60457da3054454d93dd3fb5a3ca10eef0e5b"
-  integrity sha512-sIBrW/HioKq2vqomwwcU/Y8ygAv3DlS32yKPBX5XijCc0IyQKiDxYpGqmvE9DC5Y0lNJ/G53dfS961B31wjJ1g==
-  dependencies:
-    "@tauri-apps/api" "^2.0.0"
 
 "@tauri-apps/plugin-fs@~2":
   version "2.2.0"
@@ -819,6 +817,14 @@ source-map-js@^1.2.1:
   resolved "https://registry.yarnpkg.com/source-map-js/-/source-map-js-1.2.1.tgz#1ce5650fddd87abc099eda37dcff024c2667ae46"
   integrity sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==
 
+tauri-plugin-clipboard-api@^2.1.11:
+  version "2.1.11"
+  resolved "https://registry.yarnpkg.com/tauri-plugin-clipboard-api/-/tauri-plugin-clipboard-api-2.1.11.tgz#ff45a8bb18f6ea47dd42cd7e9bad0eae07711af1"
+  integrity sha512-VNkGaVPPfRoHg7/rJBcWqsvLvn4/kNEOOlzqwyI9Qdf6g54B3mc31GLZdnq/HWtX0vZskw3J8b/EF9YkASDCBQ==
+  dependencies:
+    "@tauri-apps/api" "2.0.1"
+    valibot "^0.40.0"
+
 typescript@~5.6.2:
   version "5.6.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.6.3.tgz#5f3449e31c9d94febb17de03cc081dd56d81db5b"
@@ -831,6 +837,11 @@ update-browserslist-db@^1.1.1:
   dependencies:
     escalade "^3.2.0"
     picocolors "^1.1.1"
+
+valibot@^0.40.0:
+  version "0.40.0"
+  resolved "https://registry.yarnpkg.com/valibot/-/valibot-0.40.0.tgz#d23ffbf692d77ef51f66f77a83161c7cd2e2629b"
+  integrity sha512-XHKnaVtwHqxPwnGOsLrwka9CEaL7yNeLNp707OKv/bmT29GnPVdl6PxBOZ6BW7hF66/6QT6iVbOlnW7qVPmoKw==
 
 vite@^6.0.3:
   version "6.0.7"
