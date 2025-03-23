@@ -3,7 +3,12 @@ import "./App.css";
 import { createInitFiles, readMemo, saveMemo } from "./func.tsx";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { register } from "@tauri-apps/plugin-global-shortcut";
+import ReactMarkdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import remarkGfm from "remark-gfm";
 import clipboard from "tauri-plugin-clipboard-api";
+import remarkBreaks from "remark-breaks";
 
 function App() {
   const appWindow = getCurrentWindow();
@@ -23,10 +28,13 @@ function App() {
   const [clipboardsImageStr, setClipboardsImageStr] =
     useState<string[]>(tmpList4);
   const refIsTop = useRef(false);
+  const [isEditMode, setIsEditMode] = useState<boolean>(true);
+
   refIsTop.current = isTop;
   const refTextArea = useRef<HTMLTextAreaElement>(null!);
   const TAB_MEMO = 0;
-  const TAB_CLIPBOARD = 1;
+  const TAB_CLIPBOARD_TEXT = 1;
+  const TAB_CLIPBOARD_IMAGE = 2;
 
   const keyEventListener = (e: KeyboardEvent) => {
     if (e.ctrlKey) {
@@ -53,6 +61,14 @@ function App() {
         );
       }
     }
+    if (e.keyCode === 27) {
+      //ESC
+      setIsEditMode(false);
+    }
+    if (e.keyCode === 13) {
+      //Enter
+      setIsEditMode(true);
+    }
   };
 
   const registerShortCuts = async () => {
@@ -66,8 +82,52 @@ function App() {
     });
   };
 
+  //本当はRust側でクリップボード検知したかったが、画像のbase64への変換がうまくいかず断念。textは問題なくコピーできた。
+  //useEffect(() => {
+  //  invoke("start_clipboard_monitor");
+  //  const listenClipboardTextUpdate = listen(
+  //    "clipboard_text_update",
+  //    (event) => {
+  //      const str =
+  //        typeof event.payload === "string"
+  //          ? event.payload
+  //          : String(event.payload);
+  //      console.log("Clipboard updated:", str);
+  //      // 必要に応じた処理を記述
+  //      setClipboards([...refClipboards.current, str]);
+  //      refClipboards.current.push(str);
+  //    },
+  //  );
+  //  const listenClipboardImageUpdate = listen(
+  //    "clipboard_image_update",
+  //    (event) => {
+  //      const src =
+  //        typeof event.payload === "string"
+  //          ? event.payload
+  //          : String(event.payload);
+  //      console.log("Clipboard updated:", src);
+  //      // 必要に応じた処理を記述
+  //        refPrevClipboardImageStr.current = src;
+  //        setClipboardsImageStr([...refClipboardsImageStr.current, src]);
+  //        refClipboardsImageStr.current.push(src);
+  //    },
+  //  );
+
+  //  return () => {
+  //    listenClipboardTextUpdate.then((fn) => fn());
+  //    listenClipboardImageUpdate.then((fn) => fn());
+  //  };
+  //}, []);
+
   useEffect(() => {
     document.addEventListener("keydown", keyEventListener);
+    (async () => {
+      createInitFiles();
+      registerShortCuts();
+      //メモファイルの内容読込
+      const content = await readMemo();
+      setTextAreaContent(content);
+    })();
     clipboard.startMonitor();
 
     clipboard.onClipboardUpdate(async () => {
@@ -79,6 +139,11 @@ function App() {
             refPrevClipboard.current = text;
             setClipboards([...refClipboards.current, text]);
             refClipboards.current.push(text);
+            if (refClipboards.current.length > 30) {
+              //30超えたら、消す。
+              refClipboards.current.shift();
+              setClipboards([...refClipboards.current]);
+            }
           }
         }
       } else if (await clipboard.hasImage()) {
@@ -88,6 +153,11 @@ function App() {
           refPrevClipboardImageStr.current = src;
           setClipboardsImageStr([...refClipboardsImageStr.current, src]);
           refClipboardsImageStr.current.push(src);
+          if (refClipboardsImageStr.current.length > 30) {
+            //30超えたら、消す。
+            refClipboardsImageStr.current.shift();
+            setClipboardsImageStr([...refClipboardsImageStr.current]);
+          }
         }
       }
     });
@@ -114,7 +184,7 @@ function App() {
     <main className="w-full h-[calc(100vh-20px)] flex flex-col justify-start text-left overflow-scroll hidden-scrollbar">
       <ul className="flex flex-wrap text-sm font-medium text-center border-b border-gray-700 text-gray-400">
         <li className="me-2">
-          <a
+          <button
             onClick={() => {
               setSelectedTabNo(TAB_MEMO);
             }}
@@ -124,25 +194,40 @@ function App() {
                 }`}
           >
             Memo
-          </a>
+          </button>
         </li>
         <li className="me-2">
-          <a
+          <button
             onClick={() => {
-              setSelectedTabNo(TAB_CLIPBOARD);
+              setSelectedTabNo(TAB_CLIPBOARD_TEXT);
             }}
             className={`inline-block py-2 px-4 rounded-t-lg hover:bg-gray-800 hover:text-gray-300 
                 ${
-                  selectedTabNo === TAB_CLIPBOARD
+                  selectedTabNo === TAB_CLIPBOARD_TEXT
                     ? "bg-gray-800 text-blue-500"
                     : ""
                 }`}
           >
-            Clipboard
-          </a>
+            Clip(text)
+          </button>
+        </li>
+        <li className="me-2">
+          <button
+            onClick={() => {
+              setSelectedTabNo(TAB_CLIPBOARD_IMAGE);
+            }}
+            className={`inline-block py-2 px-4 rounded-t-lg hover:bg-gray-800 hover:text-gray-300 
+                ${
+                  selectedTabNo === TAB_CLIPBOARD_IMAGE
+                    ? "bg-gray-800 text-blue-500"
+                    : ""
+                }`}
+          >
+            Clip(image)
+          </button>
         </li>
       </ul>
-      {selectedTabNo === TAB_MEMO && (
+      {selectedTabNo === TAB_MEMO && isEditMode === true ? (
         <textarea
           ref={refTextArea}
           className="w-full h-full bg-transparent outline-none overflow-scroll resize-none hidden-scrollbar"
@@ -151,8 +236,17 @@ function App() {
             setTextAreaContent(e.target.value);
           }}
         ></textarea>
+      ) : (
+        <div className="prose bg-white leading-tight w-full">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm, remarkBreaks]}
+            components={{}}
+          >
+            {textAreaContent}
+          </ReactMarkdown>
+        </div>
       )}
-      {selectedTabNo === TAB_CLIPBOARD && (
+      {selectedTabNo === TAB_CLIPBOARD_TEXT && (
         <div className="">
           <button
             className="px-4 py-2 bg-white text-black mt-2 ml-2 mb-4 rounded-sm"
@@ -160,9 +254,6 @@ function App() {
               setClipboards([]);
               refPrevClipboard.current = "";
               refClipboards.current = [];
-              setClipboardsImageStr([]);
-              refPrevClipboardImageStr.current = "";
-              refClipboardsImageStr.current = [];
               clipboard.clear();
             }}
           >
@@ -180,6 +271,21 @@ function App() {
               <br></br>
             </div>
           ))}
+        </div>
+      )}
+      {selectedTabNo === TAB_CLIPBOARD_IMAGE && (
+        <div className="">
+          <button
+            className="px-4 py-2 bg-white text-black mt-2 ml-2 mb-4 rounded-sm"
+            onClick={() => {
+              setClipboardsImageStr([]);
+              refPrevClipboardImageStr.current = "";
+              refClipboardsImageStr.current = [];
+              clipboard.clear();
+            }}
+          >
+            clear
+          </button>
           {clipboardsImageStr.map((s, index) => (
             <div
               key={index}
